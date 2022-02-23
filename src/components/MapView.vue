@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-      <img :class="map_name" :src="'@/assets/'+map_name+'.png'" />
+      <img :class="map_name" :src="images[map_name]" />
     <img class="plot" :src="plot_src" />
     </div>
 </template>
@@ -9,6 +9,14 @@
 export default {
   name: 'MapView',
   props: ['map_name', 'plot_src'],
+  data(){
+    return {
+      images: {
+        "bonsai": require('@/assets/bonsai.png'),
+        "no-map": require('@/assets/no-map.png'), 
+      },
+    }
+  }
 }
 </script>
 

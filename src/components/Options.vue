@@ -1,5 +1,5 @@
 <template>
-  <FormKit type=button label="Add Match" @click="handleAddMatch" />
+  <FormKit type="button" label="Add Match" @click="handleAddMatch" />
   <FormKit type="form" :actions="false" v-model="opt" @submit="handleSubmit">
     <FormKit
       v-if="match_info.length > 0"
@@ -9,7 +9,7 @@
       v-model="opt.matches"
     />
     <FormKit
-    v-if="player_list.length > 0"
+      v-if="player_list.length > 0"
       type="checkbox"
       label="Players"
       :options="player_list"
@@ -40,10 +40,12 @@
 </template>
 
 <script>
+import "@/flash.min.js";
+
 export default {
   name: "Options",
   props: ["player_list", "match_info"],
-  emits: ["add-match-id"],
+  emits: ["add-match-id", "request-filter"],
   data() {
     return {
       opt: {
@@ -51,32 +53,73 @@ export default {
         side: [],
         time: 0,
         roundNum: "",
-        matches:[],
+        matches: [],
       },
     };
   },
   methods: {
     handleSubmit(e) {
       let rounds = [];
-      if (e.round_num !== "") {
+      if (e.round_num !== "" && e.round_num !== undefined) {
         let r = e.round_num.split(" ");
         r.forEach((element) => {
           rounds.push(parseInt(element) - 1);
         });
       }
       //console.log(this.opt);
+      let matches = e.matches;
+      let map_name = "";
+      let maps = []
+      if (matches.length === 0) {
+        FlashMessage.error("Please select at least one match", {
+          theme: "dark",
+        });
+        return;
+      } else if (matches.length > 1) {
+        this.match_info.forEach((match) => {
+          if (matches.includes(match.value)) {
+            console.log(match);
+            if (maps.includes(match.label) === false) {
+              maps.push(match.label);
+            }
+          }
+        });
+        console.log(maps);
+        if (maps.length > 1) {
+          FlashMessage.error("Please select only one map", {
+            theme: "dark",
+          });
+          return;
+        }
+      } else {
+        for(let i in this.match_info){
+          let match = this.match_info[i];
+          if(match.value === matches[0]){
+            map_name = match.label;
+            break;
+          }
+        }
+      }
+
+
       let options_object = {
         player: e.player,
         side: e.side,
-        time: e.time,
+        time: parseInt(e.time) * 1000,
         round: rounds,
       };
 
-      console.log(options_object);
+      let req_object = {
+        matches: matches,
+        options: options_object,
+        map_name: map_name,
+      };
+
+      this.$emit("request-filter", req_object);
     },
-    handleAddMatch(){
+    handleAddMatch() {
       let prompt = window.prompt("Enter match id");
-      this.$emit('add-match-id', prompt);
+      this.$emit("add-match-id", prompt);
     },
   },
 };
@@ -88,8 +131,8 @@ export default {
   color: aliceblue;
   cursor: pointer;
   transition-property: filter;
-    transition-duration: 0.25s;
-    transition-timing-function: ease;
-    transition-delay: 0s;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+  transition-delay: 0s;
 }
 </style>
