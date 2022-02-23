@@ -28,7 +28,7 @@
       min="0"
       max="200"
     />
-    <pre wrap>{{ opt.time }}</pre>
+    <pre wrap>Before {{ opt.time }} seconds</pre>
     <FormKit
       type="text"
       label="Round No"
