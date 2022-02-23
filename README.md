@@ -1,4 +1,7 @@
-# valorant-heatmap-frontend
+# Valorant Heatmap (Frontend Repo)
+
+![Example 1](screenshot1.png)
+
 
 ## Project setup
 ```
