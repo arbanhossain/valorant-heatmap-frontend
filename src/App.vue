@@ -64,6 +64,7 @@ export default {
             help: id,
           });
           this.match_info = new_match_info;
+          console.log(this.match_info);
 
           let players = json["players"];
 
