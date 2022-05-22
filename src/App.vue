@@ -10,6 +10,7 @@
       :match_info="match_info"
     />
   </div>
+  <button @click="addoption">Add Option</button>
 </template>
 
 <script>
@@ -36,7 +37,15 @@ export default {
     };
   },
   methods: {
+    addoption() {
+      this.player_list = [...this.player_list, {
+                value: "sample_id",
+                label: "sample name",
+                help: "sample help",
+              }]
+    },
     async add_new_match(id) {
+      if(id === "" || id === undefined || id === null) return;
       if (this.match_id_collection[id] == undefined) {
         try {
           let response = await fetch(
@@ -52,47 +61,42 @@ export default {
           let map_details = json["map_details"];
 
           // console.log(json);
+          this.match_id_collection = {...this.match_id_collection, ...{[id]: json}}
+          console.log(this.match_id_collection)
 
-          let new_match_id_collection = this.match_id_collection;
-          new_match_id_collection[id] = json;
-          this.match_id_collection = new_match_id_collection;
-
-          let new_match_info = this.match_info;
-          new_match_info.push({
+          this.match_info = [...this.match_info, {
             value: id,
             label: map_details.name,
             help: id,
-          });
-          this.match_info = new_match_info;
+          }];
           console.log(this.match_info);
 
           let players = json["players"];
 
-          let new_player_list = this.player_list;
           for (const key in players) {
             let player = players[key];
             //console.log(player)
-            if (new_player_list.some((elem) => elem.value === player.id)) {
+            if (this.player_list.some((elem) => elem.value === player.id)) {
               console.log(player);
             } else {
-              new_player_list.push({
+              this.player_list = [...this.player_list, {
                 value: player.id,
                 label: player.name,
                 help: player.id,
-              });
+              }]
             }
           }
-          this.player_list = new_player_list;
-          console.log(new_player_list);
+          console.log(this.player_list);
 
-          let map_list = this.maps;
-          if (map_list.some( map => map.name === map_details.name) === false) {
-            map_list.push(map_details);
+          if (this.maps.some( map => map.name === map_details.name) === false) {
+            this.maps = [...this.maps, map_details]
           }
-          this.maps = map_list;
 
         } catch (error) {
           console.error(error);
+          FlashMessage.error(`${error.message}`, {
+            theme: "dark",
+          });
         }
 
       }
@@ -137,10 +141,16 @@ export default {
         let json = string === "" ? {} : JSON.parse(string);
 
         let filtered_data = json["data"];
+
+        console.log(filtered_data, map_name);
         
         let map = this.maps.filter(map => map.name === map_name)[0];
   
         let plot_req = { data: filtered_data, map_details: map };
+
+        console.log('plotreq\n', plot_req);
+
+        // return;
 
         response = await fetch(
           "https://valorant-heatmap.herokuapp.com/api/utils/plot",
@@ -163,6 +173,9 @@ export default {
         console.log("plotted");
       } catch (error) {
         console.error(error);
+        FlashMessage.error(`${error.message}`, {
+          theme: "dark",
+        });
       }
 
     },

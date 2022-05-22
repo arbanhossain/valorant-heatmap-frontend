@@ -91,6 +91,7 @@ export default {
           });
           return;
         }
+        map_name = maps[0];
       } else {
         for(let i in this.match_info){
           let match = this.match_info[i];
@@ -114,6 +115,8 @@ export default {
         options: options_object,
         map_name: map_name,
       };
+
+      // console.log(req_object); return;
 
       this.$emit("request-filter", req_object);
     },
