@@ -10,7 +10,6 @@
       :match_info="match_info"
     />
   </div>
-  <button @click="addoption">Add Option</button>
 </template>
 
 <script>
@@ -37,13 +36,6 @@ export default {
     };
   },
   methods: {
-    addoption() {
-      this.player_list = [...this.player_list, {
-                value: "sample_id",
-                label: "sample name",
-                help: "sample help",
-              }]
-    },
     async add_new_match(id) {
       if(id === "" || id === undefined || id === null) return;
       if (this.match_id_collection[id] == undefined) {
